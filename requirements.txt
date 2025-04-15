@@ -1,0 +1,7 @@
+pyautogui
+keyboard
+pillow
+colorama
+pyfiglet
+alive-progress
+pywin32
