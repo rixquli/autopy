@@ -22,3 +22,5 @@ screenshots/
 sequences.json
 *.log
 .env
+.venv
+venv/
