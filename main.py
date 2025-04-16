@@ -2,15 +2,13 @@ import pyautogui
 import time
 import json
 from dataclasses import dataclass
-import keyboard
 from typing import List, Dict, Literal
-import ctypes
 from src.action_recorder import main as action_recorder
 from src.utils import safe_input
 from src.terminal_utils import (
     print_title, print_success, print_error,
     print_info, print_warning, print_menu_option, clear, 
-    print_main_title, show_startup_animation, stop_startup_animation
+    print_main_title, show_startup_animation
 )
 import subprocess
 import threading
@@ -155,19 +153,7 @@ def execute_command_sequence(action: Action):
 def main():
     sequence_manager = SequenceManager('sequences.json')
     try:
-        # Create a flag to track if animation was skipped
-        animation_thread = threading.Thread(target=show_startup_animation)
-        animation_thread.daemon = True
-        animation_thread.start()
-        
-        # Wait for animation or key press
-        while animation_thread.is_alive():
-            if keyboard.is_pressed('space') or keyboard.read_event(suppress=True):
-                stop_startup_animation()
-                time.sleep(0.1)
-                break
-            time.sleep(0.1)
-
+        show_startup_animation(2)  # Ajouter l'animation de démarrage
         while True:
             print_main_title("AutoPY")
             

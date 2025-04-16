@@ -37,23 +37,11 @@ def print_main_title(text):
     clear()
     print_banner(text)
 
-IS_RUNNING = False
-
 def show_startup_animation(duration=3):
-    global IS_RUNNING
-    IS_RUNNING = True
     print_banner("Starting AutoPY", color=Fore.GREEN)
     print_info("Ce chargement ne sert strictement à rien, mais c'est trop stylé !")
-    with IS_RUNNING and alive_bar(100, title='Loading', bar='blocks', spinner='dots') as bar:
+    with alive_bar(100, title='Loading', bar='blocks', spinner='dots') as bar:
         for i in range(100):
-            if not IS_RUNNING:
-                clear()
-                return
             time.sleep(duration/100)
             bar()
     clear()
-
-def stop_startup_animation():
-    print
-    global IS_RUNNING
-    IS_RUNNING = False
