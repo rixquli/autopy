@@ -15,6 +15,7 @@ from src.terminal_utils import (
 import subprocess
 import threading
 from src.keyboard_manager import KeyboardManager
+import os.path
 
 @dataclass
 class Action:
@@ -86,11 +87,11 @@ MOUSEEVENTF_ABSOLUTE = 0x8000
 SPI_SETCURSORS = 0x0057
 SPI_SETCURSORVIS = 0x0101
 
-def hide_cursor():
-    ctypes.windll.user32.SystemParametersInfoA(SPI_SETCURSORVIS, 0, None, 0)
+# def hide_cursor():
+#     ctypes.windll.user32.SystemParametersInfoA(SPI_SETCURSORVIS, 0, None, 0)
 
-def show_cursor():
-    ctypes.windll.user32.SystemParametersInfoA(SPI_SETCURSORVIS, 1, None, 0)
+# def show_cursor():
+#     ctypes.windll.user32.SystemParametersInfoA(SPI_SETCURSORVIS, 1, None, 0)
 
 def execute_sequence(sequence_manager: SequenceManager, sequence_name: str):
     actions = sequence_manager.get_sequence(sequence_name)
@@ -118,15 +119,23 @@ def execute_sequence(sequence_manager: SequenceManager, sequence_name: str):
 def execute_click_sequence(action: Action):
     time.sleep(action.delay)
     try:
+        if not action.image_path:
+            print_error("No image path provided for click action")
+            return
+            
+        if not os.path.exists(action.image_path):
+            print_error(f"Image file not found: {action.image_path}")
+            return
+            
         location = pyautogui.locateOnScreen(action.image_path, confidence=0.8)
         if location:
             pyautogui.click(location)
-            print(f"Clicked on {action.image_path}")
+            print_success(f"Clicked on {action.image_path}")
         else:
-            print(f"Image {action.image_path} not found")
+            print_warning(f"Image {action.image_path} was not found on screen")
     except Exception as e:
-        print(f"Error executing action: {e}")
-    show_cursor()
+        print_error(f"Error executing click action: {str(e)}")
+        print_info("Make sure the image file is a valid image format (PNG, JPG)")
 
 def execute_type_sequence(action: Action):
     time.sleep(action.delay)

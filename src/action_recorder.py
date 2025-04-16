@@ -39,23 +39,20 @@ def trigger_windows_screenshot():
         keyboard_manager = KeyboardManager()
         keyboard_manager.press_and_release('windows+shift+s')
     elif platform.system() == 'Linux':
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = os.path.abspath(f"{SCREENSHOTS_DIR}/capture_{timestamp}.png")
         try:
-            # Utiliser xclip pour Linux
-            process = subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-o'], stdout=subprocess.PIPE)
-            img_data = process.stdout
-            previous_image = img_data
-        except Exception as e:
-                print("No image in clipboard or error loading it:", e)
-        # Use gnome-screenshot for Linux
-        try:
-            subprocess.call('flameshot gui -c',  shell=True)
-            print("Utilisez l'outil de capture d'écran...")
-            time.sleep(1)
+            # Use flameshot with direct save to file
+            result = subprocess.call(f'flameshot gui --path "{filename}"', shell=True)
+            if result == 0:
+                print("Capture d'écran sauvegardée!")
+                return True
+            return False
         except subprocess.CalledProcessError:
-            print("Erreur: gnome-screenshot n'est pas installé")
+            print("Erreur: flameshot n'est pas installé")
             return False
         except FileNotFoundError:
-            print("Erreur: gnome-screenshot n'est pas disponible")
+            print("Erreur: flameshot n'est pas disponible")
             return False
     
     # Attend que l'image soit dans le presse-papier
@@ -110,16 +107,8 @@ def save_clipboard_image():
             print(f"Erreur lors de la sauvegarde: {e}")
             return None
     else:
-        try:
-            process = subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-o'], stdout=subprocess.PIPE)
-            img_data = process.stdout
-            image = Image.open(io.BytesIO(img_data))
-            image.save(filename)
-            print(f"Capture sauvegardée: {filename}")
-            return filename
-        except Exception as e:
-            print(f"Erreur lors de la sauvegarde: {e}")
-            return None
+        # For Linux, the image is already saved by flameshot
+        return filename
     
     return None
 
