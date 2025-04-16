@@ -1,8 +1,9 @@
 import platform
 if platform.system() == "Linux":
-  from pynput import keyboard as pynput_keyboard
+    from pynput import keyboard as pynput_keyboard
 else:
-  import keyboard
+    import keyboard
+
 class KeyboardManager:
     def __init__(self):
         self.system = platform.system()
@@ -15,17 +16,24 @@ class KeyboardManager:
             self.listenerUp.start()
             self.pressed_keys = set()
 
-    def _on_press(self, key):
+    def _convert_key_to_string(self, key):
         try:
-            self.pressed_keys.add(key.char)
+            if hasattr(key, 'char'):
+                return key.char
+            elif hasattr(key, 'name'):
+                return f'Key.{key.name}'
+            else:
+                return str(key)
         except AttributeError:
-            self.pressed_keys.add(str(key))
+            return str(key)
+
+    def _on_press(self, key):
+        key_str = self._convert_key_to_string(key)
+        self.pressed_keys.add(key_str)
     
     def _on_release(self, key):
-        try:
-            self.pressed_keys.remove(key.char)
-        except AttributeError:
-            self.pressed_keys.remove(str(key))
+        key_str = self._convert_key_to_string(key)
+        self.pressed_keys.discard(key_str)  # Using discard instead of remove to avoid KeyError
         if key == pynput_keyboard.Key.esc:
             return False
 
