@@ -59,8 +59,23 @@ class KeyboardManager:
                 if keys:
                     return keys
             elif self.system == "Linux":
-                if self.pressed_keys:
-                    return '+'.join(self.pressed_keys)
+                pressed_keys = set()
+                
+                def local_on_press(key):
+                    try:
+                        pressed_keys.add(key.char)
+                    except AttributeError:
+                        pressed_keys.add(str(key))
+                
+                def local_on_release(key):
+                    listener.stop()
+                    key_strings = []
+                    for k in pressed_keys:
+                        key_strings.append(str(k).replace("'", ""))
+                    return '+'.join(key_strings)
+                
+                listener = pynput_keyboard.Listener(on_press=local_on_press, on_release=local_on_release)
+                listener.start()
             else:
                 break
 
