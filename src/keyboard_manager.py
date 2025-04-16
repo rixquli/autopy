@@ -37,9 +37,9 @@ class KeyboardManager:
         if self.system == "Windows":
             return keyboard.is_pressed(key)
         elif self.system == "Linux":
-            print(f"Pressed keys: {self.pressed_keys}")
             is_pressed = key in self.pressed_keys
-            self.resest_pressed_keys()
+            if is_pressed:
+                self.resest_pressed_keys()
             return is_pressed
         return False
 
