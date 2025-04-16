@@ -20,6 +20,7 @@ from src.terminal_utils import (
 )
 
 SCREENSHOTS_DIR = "screenshots"
+tempfilename = None
 
 def setup_directories():
     if not os.path.exists(SCREENSHOTS_DIR):
@@ -40,10 +41,10 @@ def trigger_windows_screenshot():
         keyboard_manager.press_and_release('windows+shift+s')
     elif platform.system() == 'Linux':
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        filename = os.path.abspath(f"{SCREENSHOTS_DIR}/capture_{timestamp}.png")
+        tempfilename = os.path.abspath(f"{SCREENSHOTS_DIR}/capture_{timestamp}.png")
         try:
             # Use flameshot with direct save to file
-            result = subprocess.call(f'flameshot gui --path "{filename}"', shell=True)
+            result = subprocess.call(f'flameshot gui --path "{tempfilename}"', shell=True)
             if result == 0:
                 print("Capture d'écran sauvegardée!")
                 return True
@@ -93,10 +94,9 @@ def check_clipboard_different_from_previous(previous_image):
             return False
 
 def save_clipboard_image():
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"{SCREENSHOTS_DIR}/capture_{timestamp}.png"
-    
     if platform.system() == "Windows":
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        filename = f"{SCREENSHOTS_DIR}/capture_{timestamp}.png"
         try:
             image = ImageGrab.grabclipboard()
             if image:
@@ -108,7 +108,7 @@ def save_clipboard_image():
             return None
     else:
         # For Linux, the image is already saved by flameshot
-        return filename
+        return tempfilename
     
     return None
 
