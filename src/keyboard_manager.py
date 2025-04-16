@@ -17,6 +17,7 @@ class KeyboardManager:
 
     def _on_press(self, key):
         try:
+            print(key)
             self.pressed_keys.add(key.char)
         except AttributeError:
             self.pressed_keys.add(str(key))
