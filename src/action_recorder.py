@@ -1,12 +1,9 @@
 import os
-import platform
-if platform.system() == 'Windows':
-    import keyboard
-else:   
-    from pynput import keyboard
+import keyboard
 import time
 from datetime import datetime
 from PIL import ImageGrab
+import platform
 
 # Détection du système d'exploitation
 if platform.system() == 'Windows':

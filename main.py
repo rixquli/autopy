@@ -2,6 +2,7 @@ import pyautogui
 import time
 import json
 from dataclasses import dataclass
+import keyboard
 from typing import List, Dict, Literal
 import ctypes
 from src.action_recorder import main as action_recorder
@@ -13,12 +14,6 @@ from src.terminal_utils import (
 )
 import subprocess
 import threading
-import os
-import platform
-if platform.system() == 'Windows':
-    import keyboard
-else:   
-    from pynput import keyboard
 
 @dataclass
 class Action:
