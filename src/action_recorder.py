@@ -150,6 +150,7 @@ def record_action():
             
                 if keyboard_manager.is_pressed('1'):
                     time.sleep(0.01)
+                    keyboard_manager.pause_listener()
                     image_path = capture_screenshot()
                     delay = float(safe_input("Delay before action (seconds): "))
                     if image_path:
@@ -159,9 +160,11 @@ def record_action():
                             "delay": delay
                         })
                         print_success(f"Click action recorded!")
+                    keyboard_manager.resume_listener()
                     break
                 elif keyboard_manager.is_pressed('2'):
                     time.sleep(0.01)
+                    keyboard_manager.pause_listener()
                     text = safe_input("Texte à taper: ")
                     delay = float(safe_input("Délai avant l'action (en secondes): "))
                     actions.append({
@@ -169,12 +172,15 @@ def record_action():
                         "text": text,
                         "delay": delay
                     })
+                    keyboard_manager.resume_listener()
                     break
                 elif keyboard_manager.is_pressed('3'):
                     time.sleep(0.01)
+                    keyboard_manager.pause_listener()
                     pressed_keys = record_key_combination()
                     if pressed_keys is None:
                         print("Enregistrement annulé.")
+                        keyboard_manager.resume_listener()
                         break
                     delay = float(safe_input("Délai avant l'action (en secondes): "))
                     actions.append({
@@ -182,9 +188,11 @@ def record_action():
                         "pressed_keys": pressed_keys,
                         "delay": delay
                     })
+                    keyboard_manager.resume_listener()
                     break
                 elif keyboard_manager.is_pressed('4'):
                     time.sleep(0.01)
+                    keyboard_manager.pause_listener()
                     command = safe_input("Commande à exécuter: ")
                     delay = float(safe_input("Délai avant l'action (en secondes): "))
                     actions.append({
@@ -192,9 +200,11 @@ def record_action():
                         "command": command,
                         "delay": delay
                     })
+                    keyboard_manager.resume_listener()
                     break
                 elif keyboard_manager.is_pressed('5'):
                     time.sleep(0.01)
+                    keyboard_manager.pause_listener()
                     sequence_name = safe_input("Nom de la séquence: ")
                     delay = float(safe_input("Délai avant l'action (en secondes): "))
                     if sequence_name:
@@ -203,6 +213,7 @@ def record_action():
                             "sequence_to_start": sequence_name,
                             "delay": delay 
                         })
+                        keyboard_manager.resume_listener()
                         break
                     return actions
     except KeyboardInterrupt:
