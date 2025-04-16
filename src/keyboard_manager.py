@@ -38,8 +38,8 @@ class KeyboardManager:
             self.listener.stop()
 
     def resume_listener(self):
-        if self.listener:
-            self.listener.start()
+        self.listener = pynput_keyboard.Listener(on_press=self._on_press,on_release=self._on_release)
+        self.listener.start()
 
     def is_pressed(self, key):
         if self.system == "Windows":
