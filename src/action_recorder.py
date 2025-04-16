@@ -27,6 +27,7 @@ def setup_directories():
         os.makedirs(SCREENSHOTS_DIR)
 
 def trigger_windows_screenshot():
+    global tempfilename
     previous_image = None
     if platform.system() == 'Windows':
         try:
