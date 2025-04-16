@@ -27,13 +27,17 @@ def setup_directories():
 def trigger_windows_screenshot():
     # Récupère la derniere image du presse-papier si disponible
     previous_image = None
-    try:
-        win32clipboard.OpenClipboard()
-        if win32clipboard.IsClipboardFormatAvailable(win32con.CF_DIB):
-            print("Image déjà dans le presse-papier.")
-            previous_image = win32clipboard.GetClipboardData(win32con.CF_DIB)
-    finally:
-        win32clipboard.CloseClipboard()
+    if platform.system() == 'Windows':
+        try:
+            win32clipboard.OpenClipboard()
+            if win32clipboard.IsClipboardFormatAvailable(win32con.CF_DIB):
+                print("Image déjà dans le presse-papier.")
+                previous_image = win32clipboard.GetClipboardData(win32con.CF_DIB)
+        finally:
+            win32clipboard.CloseClipboard()
+    elif platform.system() == 'Linux':
+        # Pour Linux, utiliser pyperclip pour vérifier le presse-papier
+        previous_image = pyperclip.paste()
 
     keyboard_manager = KeyboardManager()
     # Simule Win+Shift+S pour lancer l'outil de capture
