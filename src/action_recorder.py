@@ -149,7 +149,7 @@ def record_action():
             print_menu_option("4", "Execute command")
             print_menu_option("5", "Start another sequence")
             print_menu_option("9", "Finish recording")
-            
+            print(keyboard_manager.is_pressed('1'))
             while True:
                 if keyboard_manager.is_pressed('9'):
                     time.sleep(0.5)
