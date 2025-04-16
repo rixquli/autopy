@@ -1,16 +1,25 @@
 import platform
 if platform.system() == "Linux":
-  from pynput import keyboard as pynput_keyboard
+    from pynput import keyboard as pynput_keyboard
+    from threading import Event, Lock
 else:
-  import keyboard
+    import keyboard
+
 class KeyboardManager:
     def __init__(self):
         self.system = platform.system()
         self.listener = None
+        self.lock = Lock() if self.system == "Linux" else None
+        self.pressed_keys = set()
         if self.system == "Linux":
-            self.listener = pynput_keyboard.Listener(on_press=self._on_press,on_release=self._on_release)
+            self._setup_listener()
+
+    def _setup_listener(self):
+        with self.lock:
+            if self.listener:
+                self.listener.stop()
+            self.listener = pynput_keyboard.Listener(on_press=self._on_press, on_release=self._on_release)
             self.listener.start()
-            self.pressed_keys = set()
 
     def _on_press(self, key):
         try:
@@ -38,8 +47,7 @@ class KeyboardManager:
             self.listener.stop()
 
     def resume_listener(self):
-        self.listener = pynput_keyboard.Listener(on_press=self._on_press,on_release=self._on_release)
-        self.listener.start()
+        self._setup_listener()
 
     def is_pressed(self, key):
         if self.system == "Windows":
@@ -52,32 +60,45 @@ class KeyboardManager:
         return False
     
     def get_pressed_keys(self):
-        # Store keys pressed in a set and return when at least one key is unpressed  
-        while True:
-            if self.system == "Windows":
-                keys = keyboard.get_hotkey_name()
-                if keys:
-                    return keys
-            elif self.system == "Linux":
-                pressed_keys = set()
-                
-                def local_on_press(key):
-                    try:
-                        pressed_keys.add(key.char)
-                    except AttributeError:
-                        pressed_keys.add(str(key))
-                
-                def local_on_release(key):
-                    listener.stop()
-                    key_strings = []
-                    for k in pressed_keys:
-                        key_strings.append(str(k).replace("'", ""))
-                    return '+'.join(key_strings)
-                
-                listener = pynput_keyboard.Listener(on_press=local_on_press, on_release=local_on_release)
-                listener.start()
-            else:
-                break
+        if self.system == "Windows":
+            keys = keyboard.get_hotkey_name()
+            if keys:
+                return keys
+            return None
+        elif self.system == "Linux":
+            pressed_keys = set()
+            key_combination = None
+            key_event = Event()
+            temp_listener = None
+
+            def local_on_press(key):
+                try:
+                    pressed_keys.add(key.char)
+                except AttributeError:
+                    pressed_keys.add(str(key))
+
+            def local_on_release(key):
+                nonlocal key_combination
+                key_strings = []
+                for k in pressed_keys:
+                    key_strings.append(str(k).replace("'", ""))
+                key_combination = '+'.join(key_strings)
+                key_event.set()
+                return False  # Stop listener
+
+            try:
+                temp_listener = pynput_keyboard.Listener(
+                    on_press=local_on_press,
+                    on_release=local_on_release,
+                    suppress=False
+                )
+                temp_listener.start()
+                key_event.wait(timeout=2)  # Réduit le timeout à 2 secondes
+                return key_combination
+            finally:
+                if temp_listener and temp_listener.is_alive():
+                    temp_listener.stop()
+        return None
 
     def press_and_release(self, keys):
         if self.system == "Windows":
@@ -115,5 +136,8 @@ class KeyboardManager:
             self.pressed_keys = set()
 
     def __del__(self):
-        if self.listener:
-            self.listener.stop()
+        if self.system == "Linux" and self.listener:
+            try:
+                self.listener.stop()
+            except:
+                pass
