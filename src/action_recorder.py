@@ -1,13 +1,16 @@
 import os
-import json
-import pyautogui
 import keyboard
 import time
 from datetime import datetime
 from PIL import ImageGrab
-import win32clipboard
-import win32con
-import io
+import platform
+
+# Détection du système d'exploitation
+if platform.system() == 'Windows':
+    import win32clipboard
+    import win32con
+else:
+    import pyperclip
 
 from src.utils import safe_input
 from src.terminal_utils import (
@@ -56,23 +59,23 @@ def trigger_windows_screenshot():
     return False
 
 def check_clipboard_different_from_previous(previous_image):
-        try:
-            win32clipboard.OpenClipboard()
-            if win32clipboard.IsClipboardFormatAvailable(win32con.CF_DIB):
-                if(previous_image == None):
-                    return True
-                current_image = win32clipboard.GetClipboardData(win32con.CF_DIB)
-                return current_image != previous_image
-        finally:
-            win32clipboard.CloseClipboard()
-        return False
-
-def check_clipboard_for_image():
-    try:
-        win32clipboard.OpenClipboard()
-        return win32clipboard.IsClipboardFormatAvailable(win32con.CF_DIB)
-    finally:
-        win32clipboard.CloseClipboard()
+        if platform.system() == 'Windows':
+            try:
+                win32clipboard.OpenClipboard()
+                if win32clipboard.IsClipboardFormatAvailable(win32con.CF_DIB):
+                    if(previous_image == None):
+                        return True
+                    current_image = win32clipboard.GetClipboardData(win32con.CF_DIB)
+                    return current_image != previous_image
+            finally:
+                win32clipboard.CloseClipboard()
+            return False
+        elif platform.system() == 'Linux':
+            # Pour Linux, utiliser pyperclip pour vérifier le presse-papier
+            current_image = pyperclip.paste()
+            if previous_image is None:
+                return True
+            return current_image != previous_image
 
 def save_clipboard_image():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
