@@ -108,6 +108,7 @@ def save_clipboard_image():
             return None
     else:
         # For Linux, the image is already saved by flameshot
+        print_error(f"Capture sauvegardée: {tempfilename}")
         return tempfilename
     
     return None
