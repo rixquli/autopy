@@ -149,73 +149,79 @@ def record_action():
             print_menu_option("4", "Execute command")
             print_menu_option("5", "Start another sequence")
             print_menu_option("9", "Finish recording")
-            print(keyboard_manager.is_pressed('1'))
-            while True:
-                if keyboard_manager.is_pressed('9'):
-                    time.sleep(0.5)
-                    return actions
             
-                if keyboard_manager.is_pressed('1'):
-                    time.sleep(0.01)
-                    image_path = capture_screenshot()
+            time.sleep(0.1)  # Petit délai pour éviter la surcharge CPU
+            
+            if keyboard_manager.is_pressed('9'):
+                time.sleep(0.5)
+                return actions
+            
+            elif keyboard_manager.is_pressed('1'):
+                time.sleep(0.2)  # Délai pour éviter les doubles détections
+                image_path = capture_screenshot()
+                if image_path:
                     delay = float(safe_input("Delay before action (seconds): "))
-                    if image_path:
-                        actions.append({
-                            "action_type": "click",
-                            "image_path": image_path,
-                            "delay": delay
-                        })
-                        print_success(f"Click action recorded!")
-                    break
-                elif keyboard_manager.is_pressed('2'):
-                    time.sleep(0.01)
-                    text = safe_input("Texte à taper: ")
-                    delay = float(safe_input("Délai avant l'action (en secondes): "))
                     actions.append({
-                        "action_type": "type",
-                        "text": text,
+                        "action_type": "click",
+                        "image_path": image_path,
                         "delay": delay
                     })
+                    print_success(f"Click action recorded!")
+                    time.sleep(0.5)  # Délai avant de réafficher le menu
+
+            elif keyboard_manager.is_pressed('2'):
+                time.sleep(0.2)
+                text = safe_input("Texte à taper: ")
+                delay = float(safe_input("Délai avant l'action (en secondes): "))
+                actions.append({
+                    "action_type": "type",
+                    "text": text,
+                    "delay": delay
+                })
+                time.sleep(0.5)
+
+            elif keyboard_manager.is_pressed('3'):
+                time.sleep(0.2)
+                pressed_keys = record_key_combination()
+                if pressed_keys is None:
+                    print("Enregistrement annulé.")
                     break
-                elif keyboard_manager.is_pressed('3'):
-                    time.sleep(0.01)
-                    pressed_keys = record_key_combination()
-                    if pressed_keys is None:
-                        print("Enregistrement annulé.")
-                        break
-                    delay = float(safe_input("Délai avant l'action (en secondes): "))
+                delay = float(safe_input("Délai avant l'action (en secondes): "))
+                actions.append({
+                    "action_type": "pressed_keys",
+                    "pressed_keys": pressed_keys,
+                    "delay": delay
+                })
+                time.sleep(0.5)
+
+            elif keyboard_manager.is_pressed('4'):
+                time.sleep(0.2)
+                command = safe_input("Commande à exécuter: ")
+                delay = float(safe_input("Délai avant l'action (en secondes): "))
+                actions.append({
+                    "action_type": "command",
+                    "command": command,
+                    "delay": delay
+                })
+                time.sleep(0.5)
+
+            elif keyboard_manager.is_pressed('5'):
+                time.sleep(0.2)
+                sequence_name = safe_input("Nom de la séquence: ")
+                delay = float(safe_input("Délai avant l'action (en secondes): "))
+                if sequence_name:
                     actions.append({
-                        "action_type": "pressed_keys",
-                        "pressed_keys": pressed_keys,
-                        "delay": delay
+                        "action_type": "start_sequence",
+                        "sequence_to_start": sequence_name,
+                        "delay": delay 
                     })
+                    time.sleep(0.5)
                     break
-                elif keyboard_manager.is_pressed('4'):
-                    time.sleep(0.01)
-                    command = safe_input("Commande à exécuter: ")
-                    delay = float(safe_input("Délai avant l'action (en secondes): "))
-                    actions.append({
-                        "action_type": "command",
-                        "command": command,
-                        "delay": delay
-                    })
-                    break
-                elif keyboard_manager.is_pressed('5'):
-                    time.sleep(0.01)
-                    sequence_name = safe_input("Nom de la séquence: ")
-                    delay = float(safe_input("Délai avant l'action (en secondes): "))
-                    if sequence_name:
-                        actions.append({
-                            "action_type": "start_sequence",
-                            "sequence_to_start": sequence_name,
-                            "delay": delay 
-                        })
-                        break
-                    return actions
+                return actions
+
     except KeyboardInterrupt:
         print_warning("\nRecording interrupted")
         return actions
-   
 
 def main():
     setup_directories()
