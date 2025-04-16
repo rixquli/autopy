@@ -92,7 +92,7 @@ class KeyboardManager:
                     suppress=False
                 )
                 temp_listener.start()
-                key_event.wait(timeout=2)  # Réduit le timeout à 2 secondes
+                key_event.wait(timeout=5)  # Réduit le timeout à 5 secondes
                 return key_combination
             finally:
                 if temp_listener and temp_listener.is_alive():

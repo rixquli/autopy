@@ -128,7 +128,7 @@ def record_key_combination():
     recorded_keys = keyboard_manager.get_pressed_keys()
     if recorded_keys:
         time.sleep(0.2)  # Petit délai pour éviter les doubles enregistrements
-        return '+'.join(recorded_keys)
+        return recorded_keys
 
 def record_action():
     keyboard_manager = KeyboardManager()
