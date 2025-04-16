@@ -123,15 +123,12 @@ def record_key_combination():
     print("Appuyez sur la combinaison de touches (ou ESC pour annuler)...")
     recorded_keys = set()
     
-    while True:
-        if keyboard_manager.is_pressed('esc'):
-            return None
-        # Attendre que l'utilisateur appuie sur au moins une touche
-        print(keyboard_manager.get_pressed_keys())
-        recorded_keys = keyboard_manager.get_pressed_keys()
-        if recorded_keys:
-            time.sleep(0.2)  # Petit délai pour éviter les doubles enregistrements
-            return '+'.join(recorded_keys)
+    # Attendre que l'utilisateur appuie sur au moins une touche
+    print(keyboard_manager.get_pressed_keys())
+    recorded_keys = keyboard_manager.get_pressed_keys()
+    if recorded_keys:
+        time.sleep(0.2)  # Petit délai pour éviter les doubles enregistrements
+        return '+'.join(recorded_keys)
 
 def record_action():
     keyboard_manager = KeyboardManager()
