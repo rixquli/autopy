@@ -202,9 +202,11 @@ def main():
                 elif keyboard_manager.is_pressed('2'):
                     time.sleep(0.01)
                     sequence_name = safe_input("Enter new sequence name: ")
+                    keyboard_manager.pause_listener()
                     sequences = action_recorder()
                     for action in sequences:
                         sequence_manager.add_action(sequence_name, action)
+                    keyboard_manager.resume_listener()
                     print_success("Sequence created!")
                     break
                 
@@ -212,9 +214,11 @@ def main():
                     time.sleep(0.01)
                     sequence_name = safe_input("Enter existing sequence name: ")
                     if sequence_name in sequence_manager.sequences:
+                        keyboard_manager.pause_listener()
                         sequences = action_recorder()
                         for action in sequences:
                             sequence_manager.add_action(sequence_name, action)
+                        keyboard_manager.resume_listener()
                         print_success("Actions added!")
                     else:
                         print_error("Sequence not found!")

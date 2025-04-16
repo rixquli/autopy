@@ -32,6 +32,14 @@ class KeyboardManager:
             
         if key == pynput_keyboard.Key.esc:
             return False
+        
+    def pause_listener(self):
+        if self.listener:
+            self.listener.stop()
+
+    def resume_listener(self):
+        if self.listener:
+            self.listener.start()
 
     def is_pressed(self, key):
         if self.system == "Windows":
