@@ -24,10 +24,16 @@ class KeyboardManager:
     
     def _on_release(self, key):
         try:
-            print(key)
-            self.pressed_keys.remove(key.char)
+            key_str = key.char
         except AttributeError:
-            self.pressed_keys.remove(str(key))
+            key_str = str(key)
+        
+        try:
+            self.pressed_keys.remove(key_str)
+        except KeyError:
+            # Key wasn't in the set, which is fine
+            pass
+            
         if key == pynput_keyboard.Key.esc:
             return False
 
