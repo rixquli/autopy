@@ -14,6 +14,7 @@ from src.terminal_utils import (
 )
 import subprocess
 import threading
+from src.keyboard_manager import KeyboardManager
 
 @dataclass
 class Action:
@@ -153,6 +154,7 @@ def execute_command_sequence(action: Action):
 
 def main():
     sequence_manager = SequenceManager('sequences.json')
+    keyboard_manager = KeyboardManager()
     try:
         show_startup_animation()  # Ajouter l'animation de démarrage
         while True:
@@ -172,12 +174,12 @@ def main():
             print_menu_option("9", "Exit")
             
             while True:
-                if keyboard.is_pressed('9'):
+                if keyboard_manager.is_pressed('9'):
                     time.sleep(0.01)
                     print_info("Exiting...")
                     return
                 
-                if keyboard.is_pressed('1'):
+                if keyboard_manager.is_pressed('1'):
                     time.sleep(0.01)
                     sequence_name = safe_input("Enter sequence name: ")
                     if sequence_name in sequence_manager.sequences:
@@ -187,7 +189,7 @@ def main():
                         print_error("Sequence not found!")
                     break
                 
-                elif keyboard.is_pressed('2'):
+                elif keyboard_manager.is_pressed('2'):
                     time.sleep(0.01)
                     sequence_name = safe_input("Enter new sequence name: ")
                     sequences = action_recorder()
@@ -196,7 +198,7 @@ def main():
                     print_success("Sequence created!")
                     break
                 
-                elif keyboard.is_pressed('3'):
+                elif keyboard_manager.is_pressed('3'):
                     time.sleep(0.01)
                     sequence_name = safe_input("Enter existing sequence name: ")
                     if sequence_name in sequence_manager.sequences:
