@@ -127,14 +127,7 @@ def record_key_combination():
         if keyboard_manager.is_pressed('esc'):
             return None
         # Attendre que l'utilisateur appuie sur au moins une touche
-        for key in 'abcdefghijklmnopqrstuvwxyz0123456789':
-            if keyboard_manager.is_pressed(key):
-                recorded_keys.add(key)
-                print(f"Enregistré: {key}")
-        for key in ['ctrl', 'shift', 'alt']:
-            if keyboard_manager.is_pressed(key):
-                recorded_keys.add(key)
-                print(f"Enregistré: {key}")
+        print(keyboard_manager.get_pressed_keys())
         if recorded_keys:
             time.sleep(0.2)  # Petit délai pour éviter les doubles enregistrements
             return '+'.join(recorded_keys)

@@ -50,6 +50,13 @@ class KeyboardManager:
                 self.resest_pressed_keys()
             return is_pressed
         return False
+    
+    def get_pressed_keys(self):
+        if self.system == "Windows":
+            return keyboard.get_hotkey_name()
+        elif self.system == "Linux":
+            return self.pressed_keys
+        return set()
 
     def press_and_release(self, keys):
         if self.system == "Windows":
