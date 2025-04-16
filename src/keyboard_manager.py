@@ -1,7 +1,8 @@
 import platform
-import keyboard
-from pynput import keyboard as pynput_keyboard
-
+if platform.system() == "Linux":
+  from pynput import keyboard as pynput_keyboard
+else:
+  import keyboard
 class KeyboardManager:
     def __init__(self):
         self.system = platform.system()
@@ -29,11 +30,31 @@ class KeyboardManager:
             keyboard.press_and_release(keys)
         elif self.system == "Linux":
             key_combination = keys.split('+')
-            with pynput_keyboard.Controller() as controller:
+            controller = pynput_keyboard.Controller()
+            # Map Windows key names to Linux key names
+            key_map = {
+                'windows': pynput_keyboard.Key.cmd,
+                'shift': pynput_keyboard.Key.shift,
+                'ctrl': pynput_keyboard.Key.ctrl,
+                'alt': pynput_keyboard.Key.alt,
+                'esc': pynput_keyboard.Key.esc
+            }
+            
+            try:
+                # Press all keys
                 for key in key_combination:
-                    controller.press(key)
+                    if key in key_map:
+                        controller.press(key_map[key])
+                    else:
+                        controller.press(key)
+                # Release all keys in reverse order
                 for key in reversed(key_combination):
-                    controller.release(key)
+                    if key in key_map:
+                        controller.release(key_map[key])
+                    else:
+                        controller.release(key)
+            except Exception as e:
+                print(f"Error with key combination: {e}")
 
     def __del__(self):
         if self.listener:
