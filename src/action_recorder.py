@@ -1,17 +1,17 @@
 import os
+os.environ["QT_QPA_PLATFORM_PLUGIN_PATH"] = "/usr/lib/x86_64-linux-gnu/qt5/plugins/platforms"
 import subprocess
 import time
 from datetime import datetime
-from PIL import ImageGrab
+from PIL import ImageGrab,Image
 import platform
 from src.keyboard_manager import KeyboardManager
+import io
 
 # Détection du système d'exploitation
 if platform.system() == 'Windows':
     import win32clipboard
     import win32con
-else:
-    import pyperclip
 
 from src.utils import safe_input
 from src.terminal_utils import (
@@ -39,9 +39,16 @@ def trigger_windows_screenshot():
         keyboard_manager = KeyboardManager()
         keyboard_manager.press_and_release('windows+shift+s')
     elif platform.system() == 'Linux':
+        try:
+            # Utiliser xclip pour Linux
+            process = subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-o'], stdout=subprocess.PIPE)
+            img_data = process.stdout
+            previous_image = img_data
+        except Exception as e:
+                print("No image in clipboard or error loading it:", e)
         # Use gnome-screenshot for Linux
         try:
-            subprocess.run(['gnome-screenshot', '-a', '-c'], check=True)
+            subprocess.call('flameshot gui -c',  shell=True)
             print("Utilisez l'outil de capture d'écran...")
             time.sleep(1)
         except subprocess.CalledProcessError:
@@ -77,25 +84,40 @@ def check_clipboard_different_from_previous(previous_image):
                 win32clipboard.CloseClipboard()
             return False
         elif platform.system() == 'Linux':
-            # Pour Linux, utiliser pyperclip pour vérifier le presse-papier
-            current_image = pyperclip.paste()
-            if previous_image is None:
-                return True
-            return current_image != previous_image
+            try:
+                # Pour Linux, utiliser pyperclip pour vérifier le presse-papier
+                process = subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-o'], stdout=subprocess.PIPE)
+                current_image = process.stdout
+                if previous_image is None:
+                    return True
+                return current_image != previous_image
+            except Exception as e:
+                print(f"Erreur lors de la sauvegarde: {e}")
+            return False
 
 def save_clipboard_image():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{SCREENSHOTS_DIR}/capture_{timestamp}.png"
     
-    try:
-        image = ImageGrab.grabclipboard()
-        if image:
-            image.save(filename)
-            print(f"Capture sauvegardée: {filename}")
-            return filename
-    except Exception as e:
-        print(f"Erreur lors de la sauvegarde: {e}")
-        return None
+    if platform == "Windows":
+        try:
+            image = ImageGrab.grabclipboard()
+            if image:
+                image.save(filename)
+                print(f"Capture sauvegardée: {filename}")
+                return filename
+        except Exception as e:
+            print(f"Erreur lors de la sauvegarde: {e}")
+            return None
+    else:
+        try:
+            process = subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-o'], stdout=subprocess.PIPE)
+            img_data = process.stdout
+            image = Image.open(io.BytesIO(img_data))
+            Image.register_save('PNG', io.BytesIO(img_data))
+        except Exception as e:
+            print(f"Erreur lors de la sauvegarde: {e}")
+            return None
     
     return None
 
