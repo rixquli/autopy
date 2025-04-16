@@ -99,7 +99,7 @@ def save_clipboard_image():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"{SCREENSHOTS_DIR}/capture_{timestamp}.png"
     
-    if platform == "Windows":
+    if platform.system() == "Windows":
         try:
             image = ImageGrab.grabclipboard()
             if image:
@@ -114,7 +114,9 @@ def save_clipboard_image():
             process = subprocess.run(['xclip', '-selection', 'clipboard', '-t', 'image/png', '-o'], stdout=subprocess.PIPE)
             img_data = process.stdout
             image = Image.open(io.BytesIO(img_data))
-            Image.register_save('PNG', io.BytesIO(img_data))
+            image.save(filename)
+            print(f"Capture sauvegardée: {filename}")
+            return filename
         except Exception as e:
             print(f"Erreur lors de la sauvegarde: {e}")
             return None
