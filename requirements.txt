@@ -5,6 +5,7 @@ colorama
 pyfiglet
 alive-progress
 opencv-python
+pynput
 pywin32; platform_system == "Windows"
 pyperclip; platform_system == "Linux"
 xlib; platform_system == "Linux"
