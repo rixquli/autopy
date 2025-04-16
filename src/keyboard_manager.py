@@ -38,7 +38,9 @@ class KeyboardManager:
             return keyboard.is_pressed(key)
         elif self.system == "Linux":
             print(f"Pressed keys: {self.pressed_keys}")
-            return key in self.pressed_keys
+            is_pressed = key in self.pressed_keys
+            self.resest_pressed_keys()
+            return is_pressed
         return False
 
     def press_and_release(self, keys):
@@ -71,6 +73,10 @@ class KeyboardManager:
                         controller.release(key)
             except Exception as e:
                 print(f"Error with key combination: {e}")
+    
+    def resest_pressed_keys(self):
+        if self.system == "Linux":
+            self.pressed_keys = set()
 
     def __del__(self):
         if self.listener:
