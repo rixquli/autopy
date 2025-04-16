@@ -1,4 +1,6 @@
 import platform
+
+from terminal_utils import print_info
 if platform.system() == "Linux":
     from pynput import keyboard as pynput_keyboard
     from threading import Event, Lock
@@ -92,7 +94,8 @@ class KeyboardManager:
                     suppress=False
                 )
                 temp_listener.start()
-                key_event.wait(timeout=5)  # Réduit le timeout à 5 secondes
+                key_event.wait()  # Réduit le timeout à 5 secondes
+                print_info(f"Pressed keys: {key_combination}")
                 return key_combination
             finally:
                 if temp_listener and temp_listener.is_alive():
