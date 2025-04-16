@@ -6,10 +6,13 @@ else:
 class KeyboardManager:
     def __init__(self):
         self.system = platform.system()
-        self.listener = None
+        self.listenerDown = None
+        self.listenerUp = None
         if self.system == "Linux":
-            self.listener = pynput_keyboard.Listener(on_press=self._on_press)
-            self.listener.start()
+            self.listenerDown = pynput_keyboard.Listener(on_press=self._on_press)
+            self.listenerUp = pynput_keyboard.Listener(on_release=self._on_release)
+            self.listenerDown.start()
+            self.listenerUp.start()
             self.pressed_keys = set()
 
     def _on_press(self, key):
@@ -17,6 +20,14 @@ class KeyboardManager:
             self.pressed_keys.add(key.char)
         except AttributeError:
             self.pressed_keys.add(str(key))
+    
+    def _on_release(self, key):
+        try:
+            self.pressed_keys.remove(key.char)
+        except AttributeError:
+            self.pressed_keys.remove(str(key))
+        if key == pynput_keyboard.Key.esc:
+            return False
 
     def is_pressed(self, key):
         if self.system == "Windows":
@@ -57,5 +68,7 @@ class KeyboardManager:
                 print(f"Error with key combination: {e}")
 
     def __del__(self):
-        if self.listener:
-            self.listener.stop()
+        if self.listenerDown:
+            self.listenerDown.stop()
+        if self.listenerUp:
+            self.listenerUp.stop()
