@@ -25,7 +25,6 @@ def setup_directories():
         os.makedirs(SCREENSHOTS_DIR)
 
 def trigger_windows_screenshot():
-    # Récupère la derniere image du presse-papier si disponible
     previous_image = None
     if platform.system() == 'Windows':
         try:
@@ -35,30 +34,31 @@ def trigger_windows_screenshot():
                 previous_image = win32clipboard.GetClipboardData(win32con.CF_DIB)
         finally:
             win32clipboard.CloseClipboard()
-    elif platform.system() == 'Linux':
-        # Pour Linux, utiliser pyperclip pour vérifier le presse-papier
-        previous_image = pyperclip.paste()
-
-    keyboard_manager = KeyboardManager()
-    # Simule Win+Shift+S pour lancer l'outil de capture
-    keyboard_manager.press_and_release('windows+shift+s')
     
-    # Attend que l'utilisateur fasse sa capture
-    print("Faites votre sélection avec l'outil de capture Windows...")
-    time.sleep(1)  # Attente pour l'ouverture de l'outil
+        keyboard_manager = KeyboardManager()
+        keyboard_manager.press_and_release('windows+shift+s')
+    elif platform.system() == 'Linux':
+        # Use gnome-screenshot for Linux
+        try:
+            subprocess.run(['gnome-screenshot', '-a', '-c'], check=True)
+            print("Utilisez l'outil de capture d'écran...")
+            time.sleep(1)
+        except subprocess.CalledProcessError:
+            print("Erreur: gnome-screenshot n'est pas installé")
+            return False
+        except FileNotFoundError:
+            print("Erreur: gnome-screenshot n'est pas disponible")
+            return False
     
     # Attend que l'image soit dans le presse-papier
-    max_wait = 30  # Temps maximum d'attente en secondes
+    max_wait = 30
     start_time = time.time()
     
     while time.time() - start_time < max_wait:
-        try:
-            if check_clipboard_different_from_previous(previous_image):
-                print("Capture détectée!")
-                time.sleep(0.5)  # Petit délai pour s'assurer que l'image est bien copiée
-                return True
-        except:
-            pass
+        if check_clipboard_different_from_previous(previous_image):
+            print("Capture détectée!")
+            time.sleep(0.5)
+            return True
         time.sleep(0.5)
     
     return False
