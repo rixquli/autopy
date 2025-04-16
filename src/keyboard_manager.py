@@ -82,6 +82,8 @@ class KeyboardManager:
                 key_strings = []
                 for k in pressed_keys:
                     key_strings.append(str(k).replace("'", "").replace("Key.", ""))
+                # reverse the order of the keys to match the order of pressing
+                key_strings = key_strings.reverse()
                 key_combination = '+'.join(key_strings)
                 key_event.set()
                 return False  # Stop listener
