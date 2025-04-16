@@ -81,7 +81,7 @@ class KeyboardManager:
                 nonlocal key_combination
                 key_strings = []
                 for k in pressed_keys:
-                    key_strings.append(str(k).replace("'", ""))
+                    key_strings.append(str(k).replace("'", "").replace("Key.", ""))
                 key_combination = '+'.join(key_strings)
                 key_event.set()
                 return False  # Stop listener
