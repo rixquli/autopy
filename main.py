@@ -10,7 +10,7 @@ from src.utils import safe_input
 from src.terminal_utils import (
     print_title, print_success, print_error,
     print_info, print_warning, print_menu_option, clear, 
-    print_main_title, show_startup_animation
+    print_main_title, show_startup_animation, stop_startup_animation
 )
 import subprocess
 import threading
@@ -81,17 +81,6 @@ class SequenceManager:
 
     def list_sequences(self) -> List[str]:
         return list(self.sequences.keys())
-
-MOUSEEVENTF_MOVE = 0x0001
-MOUSEEVENTF_ABSOLUTE = 0x8000
-SPI_SETCURSORS = 0x0057
-SPI_SETCURSORVIS = 0x0101
-
-# def hide_cursor():
-#     ctypes.windll.user32.SystemParametersInfoA(SPI_SETCURSORVIS, 0, None, 0)
-
-# def show_cursor():
-#     ctypes.windll.user32.SystemParametersInfoA(SPI_SETCURSORVIS, 1, None, 0)
 
 def execute_sequence(sequence_manager: SequenceManager, sequence_name: str):
     actions = sequence_manager.get_sequence(sequence_name)
@@ -166,7 +155,19 @@ def execute_command_sequence(action: Action):
 def main():
     sequence_manager = SequenceManager('sequences.json')
     try:
-        show_startup_animation()  # Ajouter l'animation de démarrage
+        # Create a flag to track if animation was skipped
+        animation_thread = threading.Thread(target=show_startup_animation)
+        animation_thread.daemon = True
+        animation_thread.start()
+        
+        # Wait for animation or key press
+        while animation_thread.is_alive():
+            if keyboard.is_pressed('space') or keyboard.read_event(suppress=True):
+                stop_startup_animation()
+                time.sleep(0.1)
+                break
+            time.sleep(0.1)
+
         while True:
             print_main_title("AutoPY")
             

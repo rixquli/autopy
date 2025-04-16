@@ -1,6 +1,6 @@
 import platform
 
-from terminal_utils import print_info
+from src.terminal_utils import print_info
 if platform.system() == "Linux":
     from pynput import keyboard as pynput_keyboard
     from threading import Event, Lock
