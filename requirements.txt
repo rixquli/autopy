@@ -4,6 +4,8 @@ pillow
 colorama
 pyfiglet
 alive-progress
+opencv-python
 pywin32; platform_system == "Windows"
 pyperclip; platform_system == "Linux"
 xlib; platform_system == "Linux"
+termios; platform_system == "Linux"

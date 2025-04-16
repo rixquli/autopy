@@ -91,9 +91,9 @@ def show_cursor():
     ctypes.windll.user32.SystemParametersInfoA(SPI_SETCURSORVIS, 1, None, 0)
 
 def execute_sequence(sequence_manager: SequenceManager, sequence_name: str):
-    hide_cursor()
     actions = sequence_manager.get_sequence(sequence_name)
     for action in actions:
+        print(f"Executing action: {action.action_type} with delay {action.delay} seconds")
         if(action.action_type == "click"):
             execute_click_sequence(action)
         elif(action.action_type == "type"):
@@ -112,7 +112,6 @@ def execute_sequence(sequence_manager: SequenceManager, sequence_name: str):
                 thread.start()
                 # Si vous voulez attendre que le thread termine avant de continuer
                 # thread.join()
-    show_cursor()
 
 def execute_click_sequence(action: Action):
     time.sleep(action.delay)

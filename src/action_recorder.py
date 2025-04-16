@@ -128,7 +128,7 @@ def record_action():
             
             while True:
                 if keyboard.is_pressed('9'):
-                    time.sleep(0.01)
+                    time.sleep(0.5)
                     return actions
             
                 if keyboard.is_pressed('1'):
