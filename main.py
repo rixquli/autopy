@@ -27,6 +27,7 @@ class Action:
     command: str = ""  # Optional for command action
     sequence_to_start: str = ""  # Optional for start_sequence action
 
+keyboard_manager = KeyboardManager()
 class SequenceManager:
     def __init__(self, json_file: str):
         self.json_file = json_file
@@ -138,7 +139,8 @@ def execute_type_sequence(action: Action):
 def execute_pressed_keys_sequence(action: Action):
     time.sleep(action.delay)
     try:
-        keyboard.press_and_release(action.pressed_keys)
+        
+        keyboard_manager.press_and_release(action.pressed_keys)
         print(f"Pressed keys: {action.pressed_keys}")
     except Exception as e:
         print(f"Error executing action: {e}")
@@ -154,7 +156,6 @@ def execute_command_sequence(action: Action):
 
 def main():
     sequence_manager = SequenceManager('sequences.json')
-    keyboard_manager = KeyboardManager()
     try:
         show_startup_animation()  # Ajouter l'animation de démarrage
         while True:

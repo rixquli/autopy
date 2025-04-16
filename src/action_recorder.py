@@ -1,9 +1,9 @@
 import os
-import keyboard
 import time
 from datetime import datetime
 from PIL import ImageGrab
 import platform
+from src.keyboard_manager import KeyboardManager
 
 # Détection du système d'exploitation
 if platform.system() == 'Windows':
@@ -35,8 +35,9 @@ def trigger_windows_screenshot():
     finally:
         win32clipboard.CloseClipboard()
 
+    keyboard_manager = KeyboardManager()
     # Simule Win+Shift+S pour lancer l'outil de capture
-    keyboard.press_and_release('windows+shift+s')
+    keyboard_manager.press_and_release('windows+shift+s')
     
     # Attend que l'utilisateur fasse sa capture
     print("Faites votre sélection avec l'outil de capture Windows...")
@@ -99,22 +100,26 @@ def capture_screenshot():
     return None
 
 def record_key_combination():
+    keyboard_manager = KeyboardManager()
     print("Appuyez sur la combinaison de touches (ou ESC pour annuler)...")
     recorded_keys = set()
     
     while True:
-        event = keyboard.read_event(suppress=True)
-        if event.event_type == 'down':
-            if event.name == 'esc':
-                return None
-            recorded_keys.add(event.name)
-        elif event.event_type == 'up':
-            if recorded_keys:
-                # Convertir le set en string avec le format "key1+key2+key3"
-                return '+'.join(recorded_keys)
-            
+        if keyboard_manager.is_pressed('esc'):
+            return None
+        # Attendre que l'utilisateur appuie sur au moins une touche
+        for key in 'abcdefghijklmnopqrstuvwxyz0123456789':
+            if keyboard_manager.is_pressed(key):
+                recorded_keys.add(key)
+        for key in ['ctrl', 'shift', 'alt']:
+            if keyboard_manager.is_pressed(key):
+                recorded_keys.add(key)
+        if recorded_keys:
+            time.sleep(0.2)  # Petit délai pour éviter les doubles enregistrements
+            return '+'.join(recorded_keys)
 
 def record_action():
+    keyboard_manager = KeyboardManager()
     actions = []
     try:
         while True:
@@ -127,11 +132,11 @@ def record_action():
             print_menu_option("9", "Finish recording")
             
             while True:
-                if keyboard.is_pressed('9'):
+                if keyboard_manager.is_pressed('9'):
                     time.sleep(0.5)
                     return actions
             
-                if keyboard.is_pressed('1'):
+                if keyboard_manager.is_pressed('1'):
                     time.sleep(0.01)
                     image_path = capture_screenshot()
                     delay = float(safe_input("Delay before action (seconds): "))
@@ -143,7 +148,7 @@ def record_action():
                         })
                         print_success(f"Click action recorded!")
                     break
-                elif keyboard.is_pressed('2'):
+                elif keyboard_manager.is_pressed('2'):
                     time.sleep(0.01)
                     text = safe_input("Texte à taper: ")
                     delay = float(safe_input("Délai avant l'action (en secondes): "))
@@ -153,7 +158,7 @@ def record_action():
                         "delay": delay
                     })
                     break
-                elif keyboard.is_pressed('3'):
+                elif keyboard_manager.is_pressed('3'):
                     time.sleep(0.01)
                     pressed_keys = record_key_combination()
                     if pressed_keys is None:
@@ -166,7 +171,7 @@ def record_action():
                         "delay": delay
                     })
                     break
-                elif keyboard.is_pressed('4'):
+                elif keyboard_manager.is_pressed('4'):
                     time.sleep(0.01)
                     command = safe_input("Commande à exécuter: ")
                     delay = float(safe_input("Délai avant l'action (en secondes): "))
@@ -176,7 +181,7 @@ def record_action():
                         "delay": delay
                     })
                     break
-                elif keyboard.is_pressed('5'):
+                elif keyboard_manager.is_pressed('5'):
                     time.sleep(0.01)
                     sequence_name = safe_input("Nom de la séquence: ")
                     delay = float(safe_input("Délai avant l'action (en secondes): "))

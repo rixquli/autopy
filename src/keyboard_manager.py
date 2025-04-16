@@ -24,6 +24,17 @@ class KeyboardManager:
             return key in self.pressed_keys
         return False
 
+    def press_and_release(self, keys):
+        if self.system == "Windows":
+            keyboard.press_and_release(keys)
+        elif self.system == "Linux":
+            key_combination = keys.split('+')
+            with pynput_keyboard.Controller() as controller:
+                for key in key_combination:
+                    controller.press(key)
+                for key in reversed(key_combination):
+                    controller.release(key)
+
     def __del__(self):
         if self.listener:
             self.listener.stop()
