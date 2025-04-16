@@ -21,13 +21,43 @@ if ! command -v python3 &> /dev/null; then
     fi
 fi
 
+# Create virtual environment 
+echo -e "\e[92mCreating virtual environment...\e[0m"
+python3 -m venv .venv
+source .venv/bin/activate
+
 # Install required packages
 echo -e "\e[93mInstalling required packages...\e[0m"
-python3 -m pip install --user -r "$(dirname "$0")/requirements.txt"
+pip install -r requirements.txt
+
+
+# Install Linux dependencies
+echo -e "\e[93mInstalling Linux dependencies...\e[0m"
+if command -v apt &> /dev/null; then
+    sudo apt install -y flameshot
+elif command -v dnf &> /dev/null; then
+    sudo dnf install -y flameshot
+elif command -v pacman &> /dev/null; then
+    sudo pacman -S flameshot
+else
+    echo -e "\e[91mCould not detect package manager. Please install dependencies manually.\e[0m"
+    exit 1
+fi
+
+# Detect desktop directory and create if needed
+DESKTOP_DIR="$HOME/Desktop"
+if [ ! -d "$DESKTOP_DIR" ]; then
+    DESKTOP_DIR="$HOME/Bureau"  # French system
+    if [ ! -d "$DESKTOP_DIR" ]; then
+        mkdir -p "$DESKTOP_DIR"  # Create if it doesn't exist
+    fi
+fi
 
 # Create desktop shortcut
 echo -e "\e[92mCreating desktop shortcut...\e[0m"
-DESKTOP_FILE="$HOME/Desktop/AutoPY.desktop"
+DESKTOP_FILE="$DESKTOP_DIR/AutoPY.desktop"
+mkdir -p "$(dirname "$DESKTOP_FILE")"  # Ensure parent directory exists
+
 cat > "$DESKTOP_FILE" << EOL
 [Desktop Entry]
 Version=1.0

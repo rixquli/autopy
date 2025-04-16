@@ -8,7 +8,7 @@ if ! command -v python3 &> /dev/null; then
 fi
 
 # Run the main program
-python3 "$(dirname "$0")/main.py"
+sudo -E "$(dirname "$0")/.venv/bin/python" "$(dirname "$0")/main.py"
 if [ $? -ne 0 ]; then
     echo "An error occurred while running the program."
     read -n 1 -s -r -p "Press any key to continue..."
