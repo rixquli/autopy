@@ -52,11 +52,17 @@ class KeyboardManager:
         return False
     
     def get_pressed_keys(self):
-        if self.system == "Windows":
-            return keyboard.get_hotkey_name()
-        elif self.system == "Linux":
-            return self.pressed_keys
-        return set()
+        # Store keys pressed in a set and return when at least one key is unpressed  
+        while True:
+            if self.system == "Windows":
+                keys = keyboard.get_hotkey_name()
+                if keys:
+                    return keys
+            elif self.system == "Linux":
+                if self.pressed_keys:
+                    return '+'.join(self.pressed_keys)
+            else:
+                break
 
     def press_and_release(self, keys):
         if self.system == "Windows":

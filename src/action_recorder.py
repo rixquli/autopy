@@ -128,6 +128,7 @@ def record_key_combination():
             return None
         # Attendre que l'utilisateur appuie sur au moins une touche
         print(keyboard_manager.get_pressed_keys())
+        recorded_keys = keyboard_manager.get_pressed_keys()
         if recorded_keys:
             time.sleep(0.2)  # Petit délai pour éviter les doubles enregistrements
             return '+'.join(recorded_keys)
