@@ -8,4 +8,4 @@ opencv-python
 pywin32; platform_system == "Windows"
 pyperclip; platform_system == "Linux"
 xlib; platform_system == "Linux"
-termios; platform_system == "Linux"
+pynput; platform_system == "Linux"
